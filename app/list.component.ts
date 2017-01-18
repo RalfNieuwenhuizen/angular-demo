@@ -14,9 +14,9 @@ import { List } from './list';
       </div>
       <div *ngIf="activeList">
         <h3>{{activeList.description}}</h3>
-        <ul *ngIf="activeList.words">
+        <ol *ngIf="activeList.words">
             <li *ngFor="let word of activeList.words">{{word}}</li>
-        </ul>
+        </ol>
         <p *ngIf="!activeList.words">
             Loading words from HackerNews server...
         </p>

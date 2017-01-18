@@ -20,7 +20,7 @@ body {
   margin: 10px;
 }
 
-ul {
+ul, ol {
   text-align: left;
   width: auto;
   display: inline-block;
