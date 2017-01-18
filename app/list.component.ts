@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HNService } from './hn.service';
 import { List } from './list';
 
@@ -7,22 +7,29 @@ import { List } from './list';
   template: `
       <h2>Lists</h2>
       <div class="menu">
-        <select [(ngModel)]="activeList">
+        <select [(ngModel)]="activeList" (change)="pickList()">
             <option *ngFor="let list of lists" [ngValue]="list">{{list.description}}</option>
         </select>
         <button (click)="refresh()">Refresh</button>
       </div>
       <div *ngIf="activeList">
-        <h2>{{activeList.description}}</h2>
+        <h3>{{activeList.description}}</h3>
         <ul *ngIf="activeList.words">
             <li *ngFor="let word of activeList.words">{{word}}</li>
         </ul>
+        <p *ngIf="!activeList.words">
+            Loading words from HackerNews server...
+        </p>
       </div>  
   `,
   providers: [HNService],
 })
-export class ListComponent  {
+export class ListComponent implements OnInit {
   constructor(private hnService: HNService) { }
+
+  ngOnInit() {
+    this.pickList();
+  }
 
   lists: List[] = [
     {
@@ -40,6 +47,10 @@ export class ListComponent  {
   ];
   activeList: List = this.lists[0];
 
+  pickList() {
+    if (!this.activeList.words)
+      this.refresh();
+  }
 
   refresh() {
     console.log("Refresh")

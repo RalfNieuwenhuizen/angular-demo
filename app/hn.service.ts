@@ -12,24 +12,40 @@ export class HNService {
 
     constructor (private http: Http) {}
 
+    stories: Object[] = [];
+
+    getStory (storyId: string) : Observable<string> {
+        var obs = this.http.get(this.hnUrl + `/item/${storyId}.json`)
+            .map(this.extractData)
+            .catch(this.handleError);
+
+        return obs;
+    }
+
     // Top 10 most occurring words in the last 600 stories
-    wordsFromLast600: Observable<string>;
+    wordsFromLast600: string[];
     getWordsFromLast600 (list: List = null): Observable<string> {
         var obs = this.http.get(this.hnUrl + '/newstories.json')
                         .map(this.extractData)
                         .catch(this.handleError);
 
+        var hnService = this;
         obs.subscribe(function (result) {
-            this.wordsFromLast600 = result;
+            result.forEach(function (storyId: string) {
+                hnService.getStory(storyId).subscribe(function (story) {
+                    hnService.stories[storyId] = story;
+                })
+            })
+            hnService.wordsFromLast600 = result;
             if (list)
-                list.words = this.wordsFromLast600;
+                list.words = hnService.wordsFromLast600;
         });
 
         return obs;
     }
 
     // Top 10 most occurring words in the posts of exactly the last week
-    wordsFromLastWeek: Observable<string>;
+    wordsFromLastWeek: string[];
     getWordsFromLastWeek (list: List = null): Observable<string> {
         var obs = this.http.get(this.hnUrl + '/newstories.json')
                         .map(this.extractData)
@@ -45,7 +61,7 @@ export class HNService {
     }
 
     // Top 10 most occurring words in titles of the last 60 stories of users with at least 10.000 karma
-    wordsFromKarmaUsersTitles: Observable<string>;
+    wordsFromKarmaUsersTitles: string[];
     getWordsFromKarmaUsersTitles (list: List = null): Observable<string> {
         var obs = this.http.get(this.hnUrl + '/newstories.json')
                         .map(this.extractData)
